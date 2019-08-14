@@ -6,14 +6,17 @@ const algorithm = require('./algorithm')
 const Reader = require('./reader')
 const Entity = require('./entity')
 
-const SERVER_VERSION = '1.0.4'
-const SERVER_PORT = "1337"
+
+const server = {
+    version: '1.0.4',
+    port: '8083'
+};
 const userBots = []
 let userWS = null
 let stoppingBots = false
 
 
-console.log(`[SERVER] Running version ${SERVER_VERSION} on port ${SERVER_PORT}`)
+console.log(`[SERVER] Running version ${server.version} on port ${server.port}`)
 
 const game = {
     url: '',
@@ -344,7 +347,7 @@ class Bot {
 }
 
 new WebSocket.Server({
-    port: SERVER_PORT
+    port: server.port
 }).on('connection', ws => {
     userWS = ws
     console.log('[SERVER] User connected')
