@@ -8,7 +8,7 @@ const Entity = require('./entity')
 
 
 const server = {
-    version: '1.0.5',
+    version: '1.0.6',
     port: '8083'
 };
 const userBots = []
