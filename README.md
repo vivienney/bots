@@ -6,27 +6,6 @@ Free open source agar.io bots
 ## Usage
 [Video tutorial for Windows](https://www.youtube.com/watch?v=TkihvNIpiTw)
 
-Q and A
-Q: I got captcha I cant play anymore with the bots!
-
-A: Restart your W-lan Router to get a new IP!
--
-Q: I did Restarted my W-lan Router but still have Captcha!
-
-A: You Have a statical ip so you cant change your ip!
--
-Q: How to change the ip when my is static?
-
-A: Get a VPN Like ProtonVPN(Almost everyip banned), NordVPN, Cyberghost(now paid :c) , PerfectPrivacy(paid), tunnelbear, DM @Turbo - ターボ  for PureVPN for $15/yr
--
-Q: My ip have still captcha with the vpn!
-
-A: Than the VPN got already agar.io Captcha, Try a other IP / Country of the vpn!
--
-Q: Why did i got Captcha?
-
-A: You did Close the console Without pressing Stop bots and dint wait the 30 seconds!
-
 
 Windows
 -------
