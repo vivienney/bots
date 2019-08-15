@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Free Agar.io Bots (Vanilla Version)
-// @version      1.0.4
+// @version      1.0.5
 // @description  Free open source agar.io bots
 // @author       Nel
 // @grant        none
@@ -222,6 +222,13 @@ window.connection = {
             case 3:
                 alert('Your IP has captcha and bots are unable to spawn, change your ip with a VPN or something to one that doesn\'t has captcha in order to use the bots')
                 break
+             case 4:
+                 //Connected Bot count = getUint8(1)
+                //Spawned Bot count = getUint8(2)
+                //Server player amount = getUint8(3)
+                $('#botCount').html(`${dataView.getUint8(1)}/${dataView.getUint8(2)}/${window.bots.amount}`)
+                $('#slots').html(dataView.getUint8(3) + "/200")
+                break;
         }
     },
     onclose() {
@@ -619,13 +626,22 @@ function setGUIEvents() {
     })
     document.getElementById('startBots').addEventListener('click', () => {
         if (window.game.url && window.game.protocolVersion && window.game.clientVersion && !window.user.startedBots) {
-            if (window.bots.name && window.bots.amount && !document.getElementById('socialLoginContainer')) window.connection.send(window.buffers.startBots(window.game.url, window.game.protocolVersion, window.game.clientVersion, window.user.isAlive, window.bots.name, window.bots.amount))
+            if (window.bots.name && window.bots.amount && !document.getElementById('socialLoginContainer')) window.connection.send(window.buffers.startBots(window.game.url.split('?')[0], window.game.protocolVersion, window.game.clientVersion, window.user.isAlive, window.bots.name, window.bots.amount))
             else alert('Bots name and amount are required before starting the bots, also you need to be logged in to your agar.io account in order to start the bots')
         }
     })
     document.getElementById('stopBots').addEventListener('click', () => {
         if (window.user.startedBots) window.connection.send(new Uint8Array([1]).buffer)
     })
+}
+
+function loadUI(){
+ $('body').append(`
+<div id="botClient" style="position: absolute; top: 92%; left: 85%; padding: 0px 8px; font-family: Tahoma; color: rgb(255, 255, 255); z-index: 9999; border-radius: 5px; min-height: 16px; min-width: 200px; background-color: rgba(2, 0, 0, 0.4);">
+<div><b>Bot Count</b>: <span id="botCount" class="label label-info pull-right">Waiting</span></div>
+<b><div><b>ServerSlots</b>: <span id="slots" class="label label-info pull-right">Waiting</span></div>
+</div>`);
+
 }
 
 WebSocket.prototype.storedSend = WebSocket.prototype.send
@@ -653,6 +669,7 @@ new MutationObserver(mutations => {
                             setGUI()
                             setGUIStyle()
                             setGUIEvents()
+                            loadUI()
                         }, 3500)
                     })
             }

@@ -8,12 +8,15 @@ const Entity = require('./entity')
 
 
 const server = {
-    version: '1.0.4',
+    version: '1.0.5',
     port: '8083'
 };
 const userBots = []
 let userWS = null
 let stoppingBots = false
+let connectedBots = 0
+let spawnedBots = 0;
+let serverPlayers = 0;
 
 
 console.log(`[SERVER] Running version ${server.version} on port ${server.port}`)
@@ -61,6 +64,7 @@ const dataBot = {
     onopen() {
         this.send(buffers.protocolVersion(game.protocolVersion))
         this.send(buffers.clientVersion(game.clientVersion))
+		
     },
     onmessage(message) {
         if (this.buffersKey) message.data = algorithm.rotateBufferBytes(message.data, this.buffersKey)
@@ -78,14 +82,17 @@ const dataBot = {
         switch (reader.readUint8()) {
             case 54:
                 this.playersAmount = 0
+				serverPlayers = 0;
                 reader.byteOffset += 2
                 while (reader.byteOffset < reader.buffer.byteLength) {
                     const flags = reader.readUint8()
                     if (flags & 2) reader.readString()
                     if (flags & 4) reader.byteOffset += 4
                     this.playersAmount++
+					serverPlayers++
                 }
                 this.lastPlayersAmount = this.playersAmount
+				 
                 break
             case 241:
                 this.buffersKey = reader.readInt32() ^ game.clientVersion
@@ -145,9 +152,14 @@ class Bot {
             this.ws.send(buffer)
         }
     }
-    onopen() {
+    onopen(){
         this.send(buffers.protocolVersion(game.protocolVersion))
         this.send(buffers.clientVersion(game.clientVersion))
+        this.isConnected = true
+        connectedBots++
+		setInterval(() => {
+		userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
+		}, 500);
     }
     onmessage(message) {
         if (this.decryptionKey) message.data = algorithm.rotateBufferBytes(message.data, this.decryptionKey ^ game.clientVersion)
@@ -158,10 +170,12 @@ class Bot {
             if (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN) this.ws.close()
         }, 1000)
     }
-    onclose() {
-        if (this.isConnected) {
+    onclose(){
+        if(this.isConnected){
             this.isConnected = false
-            if (!this.gotCaptcha) this.connect()
+            connectedBots--
+			userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
+            //if(!this.gotCaptcha) setTimeout(this.connect.bind(this), 1000)
         }
     }
     handleBuffer(buffer) {
@@ -169,21 +183,23 @@ class Bot {
         switch (reader.readUint8()) {
             case 32:
                 this.cellsIDs.push(reader.readUint32())
-                if (!this.isAlive) {
+                if(!this.isAlive){
                     this.isAlive = true
-                    if (!user.startedBots) {
+					spawnedBots++
+					//userWS.send(Buffer.from([6, spawnedBots]))
+                    if(!user.startedBots){
                         setInterval(() => {
-                            for (const bot of userBots) {
-                                if (bot.isAlive) bot.move()
+                            for(const bot of userBots){
+                                if(bot.isAlive) bot.move()
                             }
                         }, 40)
                         userWS.send(Buffer.from([0]))
                         user.startedBots = true
                         console.log('[SERVER] Bots started')
                     }
-                    if (!this.followMouseTimeout) {
+                    if(!this.followMouseTimeout){
                         this.followMouseTimeout = setTimeout(() => {
-                            if (this.isAlive) this.followMouse = true
+                            if(this.isAlive) this.followMouse = true
                         }, 18000)
                     }
                 }
@@ -253,9 +269,11 @@ class Bot {
             if (this.cellsIDs.includes(removedEntityID)) this.cellsIDs.splice(this.cellsIDs.indexOf(removedEntityID), 1)
             delete this.viewportEntities[removedEntityID]
         }
-        if (this.isAlive && !this.cellsIDs.length) {
+        if(this.isAlive && this.cellsIDs.length === 0){
             this.isAlive = false
-            if (this.followMouseTimeout) {
+			spawnedBots--
+		//	userWS.send(Buffer.from([6, spawnedBots]))
+            if(this.followMouseTimeout){
                 clearTimeout(this.followMouseTimeout)
                 this.followMouseTimeout = null
             }
@@ -364,12 +382,9 @@ new WebSocket.Server({
                     bots.amount = reader.readUint8()
                     dataBot.connect()
                     let index = 0
-                    let startBotsInterval = setInterval(() => {
-                        if (dataBot.lastPlayersAmount < 200 && index < bots.amount) {
-                            userBots.push(new Bot())
-                            index++
-                        } else clearInterval(startBotsInterval)
-                    }, 300)
+                   startBotsInterval = setInterval(() => {
+                        if(dataBot.lastPlayersAmount < 195 && connectedBots < bots.amount) userBots.push(new Bot())
+                    }, 150)
                     console.log('[SERVER] Starting bots...')
                 }
                 break
