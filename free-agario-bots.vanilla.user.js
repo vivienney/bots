@@ -119,7 +119,7 @@ window.setUpOptions = () => {
 
 window.SERVER_HOST = 'localhost' // Hostname/IP of the server where the bots are running [Default = localhost (your own pc)]
 
-window.SERVER_PORT = 1337 // Port number used on the server where the bots are running [Default = 1337]
+window.SERVER_PORT = 8083 // Port number used on the server where the bots are running [Default = 1337]
 
 window.ZOOM_SPEED = 0.85 // Numerical value that indicates the speed of the mouse wheel when zooming, value must be between 0.01-0.99 [Default = 0.85]
 
