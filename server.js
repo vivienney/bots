@@ -8,7 +8,7 @@ const Entity = require('./entity')
 
 
 const server = {
-    version: '1.0.6',
+    version: '1.0.7',
     port: '8083'
 };
 const userBots = []
@@ -157,9 +157,6 @@ class Bot {
         this.send(buffers.clientVersion(game.clientVersion))
         this.isConnected = true
         connectedBots++
-		setInterval(() => {
-		userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
-		}, 500);
     }
     onmessage(message) {
         if (this.decryptionKey) message.data = algorithm.rotateBufferBytes(message.data, this.decryptionKey ^ game.clientVersion)
@@ -174,7 +171,7 @@ class Bot {
         if(this.isConnected){
             this.isConnected = false
             connectedBots--
-			userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
+			//userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
             //if(!this.gotCaptcha) setTimeout(this.connect.bind(this), 1000)
         }
     }
@@ -367,6 +364,9 @@ class Bot {
 new WebSocket.Server({
     port: server.port
 }).on('connection', ws => {
+	setInterval(() => {
+		userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
+		}, 1000);
     userWS = ws
     console.log('[SERVER] User connected')
     ws.on('message', buffer => {
