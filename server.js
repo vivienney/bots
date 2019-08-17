@@ -383,7 +383,7 @@ new WebSocket.Server({
                     dataBot.connect()
                     let index = 0
                    startBotsInterval = setInterval(() => {
-                        if(dataBot.lastPlayersAmount < 195 && connectedBots < bots.amount) userBots.push(new Bot())
+                        if(dataBot.lastPlayersAmount < 195 && connectedBots < bots.amount && !stoppingBots) userBots.push(new Bot())
                     }, 150)
                     console.log('[SERVER] Starting bots...')
                 }
