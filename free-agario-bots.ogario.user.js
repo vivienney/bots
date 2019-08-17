@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Free Agar.io Bots (OGARio Version)
-// @version      1.0.6
+// @version      1.0.7
 // @description  Free open source agar.io bots with OGARio
 // @author       Nel & szymy (OGARio deobfuscated by ReF)
 // @grant        GM_xmlhttpRequest
@@ -10,7 +10,7 @@
 // @connect      cdn.ogario.ovh
 // ==/UserScript==
 
-const CLIENT_VERSION = '1.0.6'
+const CLIENT_VERSION = '1.0.7'
 
 if(location.host === 'agar.io' && location.pathname === '/'){
     location.href = `https://agar.io/ogario${location.hash}`
@@ -40,6 +40,6 @@ GM_xmlhttpRequest({
                 }
             })
         }
-        else alert('Outdated client version, join our discord server to get latest version: https://discord.gg/SDMNEcJ')
+        else alert('Outdated client version, join our discord server to get latest version: https://discord.gg/SDMNEcJ  Do you using Latest version?, Still get this message? Wait until the Version on the website got updated aswell')
     }
 })
