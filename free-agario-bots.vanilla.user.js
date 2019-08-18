@@ -2,7 +2,7 @@
 // @name         Free Agar.io Bots (Vanilla Version)
 // @version      1.0.7
 // @description  Free open source agar.io bots
-// @author       Nel
+// @author       Nel, Nebula
 // @grant        none
 // @run-at       document-start
 // @match        *://agar.io/*
