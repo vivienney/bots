@@ -1,6 +1,6 @@
 {
     "server": {
-        "port": 1337,
+        "port": 8083,
         "version": "1.0.8",
         "update": true,
         "link": "https://raw.githubusercontent.com/xN3BULA/free-agario-bots/master/config.json"
