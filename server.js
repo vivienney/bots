@@ -1,25 +1,37 @@
-const WebSocket = require('ws')
-const { murmur2 } = require('murmurhash-js')
+const WebSocket = require('ws'),
+    { murmur2 } = require('murmurhash-js'),
+    buffers = require('./buffers'),
+    algorithm = require('./algorithm'),
+    Reader = require('./reader'),
+    Entity = require('./entity'),
+    requester = require("request-promise"),
+    logger = require("./logger.js"),
+    config = require('./config.json');
 
-const buffers = require('./buffers')
-const algorithm = require('./algorithm')
-const Reader = require('./reader')
-const Entity = require('./entity')
+const userBots = [];
+let userWS = null,
+    stoppingBots = false,
+    connectedBots = 0,
+    spawnedBots = 0,
+    serverPlayers = 0;
 
+if (config.server.update) {
+    requester(config.server.link, (err, req, data) => {
+        const requesterData = Buffer.from(data).toString()
+        requesterConfig = JSON.parse(requesterData)
 
-const server = {
-    version: '1.0.7',
-    port: '8083'
-};
-const userBots = []
-let userWS = null
-let stoppingBots = false
-let connectedBots = 0
-let spawnedBots = 0;
-let serverPlayers = 0;
+        if (config.server.version < requesterConfig.server.version) {
+            logger.warn(`[SERVER] A new update was found!`)
+            logger.warn(`[SERVER] Download -> https://github.com/xN3BULA/free-agario-bots`)
+        } else {
+            logger.error(`[SERVER] No updates found!`)
+        }
+    })
+} else {
+    logger.error('[SERVER] Update is false!')
+}
 
-
-console.log(`[SERVER] Running version ${server.version} on port ${server.port}`)
+logger.good(`[SERVER] Running version ${config.server.version} on port ${config.server.port}`)
 
 const game = {
     url: '',
@@ -64,7 +76,7 @@ const dataBot = {
     onopen() {
         this.send(buffers.protocolVersion(game.protocolVersion))
         this.send(buffers.clientVersion(game.clientVersion))
-		
+
     },
     onmessage(message) {
         if (this.buffersKey) message.data = algorithm.rotateBufferBytes(message.data, this.buffersKey)
@@ -74,7 +86,7 @@ const dataBot = {
         if (this.isConnected) {
             this.isConnected = false
             this.connect()
-            console.log('[SERVER] DataBot disconnected')
+            logger.error('[SERVER] DataBot disconnected!')
         }
     },
     handleBuffer(buffer) {
@@ -82,22 +94,22 @@ const dataBot = {
         switch (reader.readUint8()) {
             case 54:
                 this.playersAmount = 0
-				serverPlayers = 0;
+                serverPlayers = 0;
                 reader.byteOffset += 2
                 while (reader.byteOffset < reader.buffer.byteLength) {
                     const flags = reader.readUint8()
                     if (flags & 2) reader.readString()
                     if (flags & 4) reader.byteOffset += 4
                     this.playersAmount++
-					serverPlayers++
+                        serverPlayers++
                 }
                 this.lastPlayersAmount = this.playersAmount
-				 
+
                 break
             case 241:
                 this.buffersKey = reader.readInt32() ^ game.clientVersion
                 this.isConnected = true
-                console.log('[SERVER] DataBot connected')
+                logger.good('[SERVER] DataBot connected!')
                 break
         }
     }
@@ -152,7 +164,7 @@ class Bot {
             this.ws.send(buffer)
         }
     }
-    onopen(){
+    onopen() {
         this.send(buffers.protocolVersion(game.protocolVersion))
         this.send(buffers.clientVersion(game.clientVersion))
         this.isConnected = true
@@ -167,11 +179,11 @@ class Bot {
             if (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN) this.ws.close()
         }, 1000)
     }
-    onclose(){
-        if(this.isConnected){
+    onclose() {
+        if (this.isConnected) {
             this.isConnected = false
             connectedBots--
-			//userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
+            //userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
             //if(!this.gotCaptcha) setTimeout(this.connect.bind(this), 1000)
         }
     }
@@ -180,23 +192,23 @@ class Bot {
         switch (reader.readUint8()) {
             case 32:
                 this.cellsIDs.push(reader.readUint32())
-                if(!this.isAlive){
+                if (!this.isAlive) {
                     this.isAlive = true
-					spawnedBots++
-					//userWS.send(Buffer.from([6, spawnedBots]))
-                    if(!user.startedBots){
+                    spawnedBots++
+                    //userWS.send(Buffer.from([6, spawnedBots]))
+                    if (!user.startedBots) {
                         setInterval(() => {
-                            for(const bot of userBots){
-                                if(bot.isAlive) bot.move()
+                            for (const bot of userBots) {
+                                if (bot.isAlive) bot.move()
                             }
                         }, 40)
                         userWS.send(Buffer.from([0]))
                         user.startedBots = true
-                        console.log('[SERVER] Bots started')
+                        logger.good('[SERVER] Bots started!')
                     }
-                    if(!this.followMouseTimeout){
+                    if (!this.followMouseTimeout) {
                         this.followMouseTimeout = setTimeout(() => {
-                            if(this.isAlive) this.followMouse = true
+                            if (this.isAlive) this.followMouse = true
                         }, 18000)
                     }
                 }
@@ -266,11 +278,11 @@ class Bot {
             if (this.cellsIDs.includes(removedEntityID)) this.cellsIDs.splice(this.cellsIDs.indexOf(removedEntityID), 1)
             delete this.viewportEntities[removedEntityID]
         }
-        if(this.isAlive && this.cellsIDs.length === 0){
+        if (this.isAlive && this.cellsIDs.length === 0) {
             this.isAlive = false
-			spawnedBots--
-		//	userWS.send(Buffer.from([6, spawnedBots]))
-            if(this.followMouseTimeout){
+            spawnedBots--
+            //	userWS.send(Buffer.from([6, spawnedBots]))
+            if (this.followMouseTimeout) {
                 clearTimeout(this.followMouseTimeout)
                 this.followMouseTimeout = null
             }
@@ -362,13 +374,13 @@ class Bot {
 }
 
 new WebSocket.Server({
-    port: server.port
+    port: config.server.port
 }).on('connection', ws => {
-	setInterval(() => {
-		userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
-		}, 1000);
+    setInterval(() => {
+        userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
+    }, 1000);
     userWS = ws
-    console.log('[SERVER] User connected')
+    logger.good('[SERVER] User connected!')
     ws.on('message', buffer => {
         const reader = new Reader(buffer)
         switch (reader.readUint8()) {
@@ -382,10 +394,10 @@ new WebSocket.Server({
                     bots.amount = reader.readUint8()
                     dataBot.connect()
                     let index = 0
-                   startBotsInterval = setInterval(() => {
-                        if(dataBot.lastPlayersAmount < 195 && connectedBots < bots.amount && !stoppingBots) userBots.push(new Bot())
+                    startBotsInterval = setInterval(() => {
+                        if (dataBot.lastPlayersAmount < 195 && connectedBots < bots.amount && !stoppingBots) userBots.push(new Bot())
                     }, 150)
-                    console.log('[SERVER] Starting bots...')
+                    logger.good('[SERVER] Starting bots...')
                 }
                 break
             case 1:
@@ -398,7 +410,7 @@ new WebSocket.Server({
                             ws.send(Buffer.from([2]))
                             setTimeout(process.exit, 1000)
                         } else {
-                            console.log(`[SERVER] Stopping bots in ${30 - seconds} seconds`)
+                            logger.warn(`[SERVER] Stopping bots in ${30 - seconds} seconds`)
                             seconds++
                         }
                     }, 1000)
@@ -433,11 +445,11 @@ new WebSocket.Server({
             setInterval(() => {
                 if (seconds === 30) process.exit()
                 else {
-                    console.log(`[SERVER] Stopping bots in ${30 - seconds} seconds`)
+                    logger.warn(`[SERVER] Stopping bots in ${30 - seconds} seconds`)
                     seconds++
                 }
             }, 1000)
         }
-        console.log('[SERVER] User disconnected')
+        logger.error('[SERVER] User disconnected!')
     })
 })
