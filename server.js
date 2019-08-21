@@ -24,7 +24,7 @@ if (config.server.update) {
             logger.warn(`[SERVER] A new update was found!`)
             logger.warn(`[SERVER] Download -> https://github.com/xN3BULA/free-agario-bots`)
         } else {
-            logger.error(`[SERVER] No updates found!`)
+            logger.good(`[SERVER] No updates found!`)
         }
     })
 } else {
