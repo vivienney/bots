@@ -1,8 +1,6 @@
 require("colour");
 
 const Logger = {
-
-    spaces: '     ',
     prefix: {
         g: 'INFO: '.green,
         a: 'ALERT:'.yellow,
@@ -11,7 +9,7 @@ const Logger = {
 
     __: function(prefix, msg) {
 
-        console.log(Logger.spaces + " " + prefix + " " + msg.white.bold);
+        console.log(prefix + " " + msg.white.bold);
     },
 
     error: function() {
