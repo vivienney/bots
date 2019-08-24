@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         Free Agar.io Bots (Vanilla Version)
-// @version      1.0.8
+// @name         Free Agar.io Bots (Vanilla Version) nebula
+// @version      1.0.9
 // @description  Free open source agar.io bots
 // @author       Nel, Nebula
 // @grant        none
@@ -225,7 +225,10 @@ window.connection = {
                 //Spawned Bot count = getUint8(2)
                 //Server player amount = getUint8(3)
                 $('#botCount').html(`${dataView.getUint8(1)}/${dataView.getUint8(2)}/${window.bots.amount}`)
-                $('#slots').html(dataView.getUint8(3) + "/200")
+               // $('#slots').html(dataView.getUint8(3) + "/200")
+                break;
+            case 5:
+                $('#slots').html(dataView.getUint8(1) + "/200")
                 break;
         }
     },
