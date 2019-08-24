@@ -377,7 +377,8 @@ new WebSocket.Server({
     port: config.server.port
 }).on('connection', ws => {
     setInterval(() => {
-        userWS.send(Buffer.from([4, connectedBots, spawnedBots, serverPlayers]))
+        userWS.send(Buffer.from([4, connectedBots, spawnedBots]))
+        userWS.send(Buffer.from([5, serverPlayers]))
     }, 1000);
     userWS = ws
     logger.good('[SERVER] User connected!')
