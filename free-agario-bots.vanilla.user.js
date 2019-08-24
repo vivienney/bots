@@ -117,9 +117,7 @@ window.setUpOptions = () => {
     }
 }
 
-window.SERVER_HOST = 'localhost' // Hostname/IP of the server where the bots are running [Default = localhost (your own pc)]
-
-window.SERVER_PORT = 8083 // Port number used on the server where the bots are running [Default = 1337]
+window.SERVER_HOST = 'wss://localhost:8083' // Hostname/IP of the server where the bots are running [Default = localhost (your own pc)]
 
 window.ZOOM_SPEED = 0.85 // Numerical value that indicates the speed of the mouse wheel when zooming, value must be between 0.01-0.99 [Default = 0.85]
 
@@ -177,7 +175,7 @@ window.buffers = {
 window.connection = {
     ws: null,
     connect() {
-        this.ws = new WebSocket(`ws://${window.SERVER_HOST}:${window.SERVER_PORT}`)
+        this.ws = new WebSocket(`${window.SERVER_HOST}`)
         this.ws.binaryType = 'arraybuffer'
         this.ws.onopen = this.onopen.bind(this)
         this.ws.onmessage = this.onmessage.bind(this)
@@ -370,7 +368,6 @@ function setGUI() {
             <div class="inputs-tab-bar">
 <span  id="settingsbutton"class="inputs-tab active" target="#settings"><i class="fa fa-keyboard-o"></i> <span>Settings</span></span>
                 <span id="hotkeysbutton" class="inputs-tab" target="#hotkeys"><i class="fa fa-keyboard-o"></i> <span>Hotkeys</span></span>
-
                 <span class="inputs-tab close" target="#close">X</span>
             </div>
             <div class="inputs-menu-container">
@@ -380,7 +377,6 @@ function setGUI() {
         </div>`
     $("#mainui-play").append(menuhtml);
     document.getElementById('advertisement').innerHTML = `
-
 <button id="botsPanel">Options</button>
         <h2 id="botsInfo">
             <a href="https://discord.gg/SDMNEcJ" target="_blank">Free Agar.io Bots</a>
@@ -421,20 +417,17 @@ function setGUIStyle() {
     border-radius: 5px;
     background: rgba(255, 255, 255, 0.95);
 }
-
 #hotkeys .row, #settings .row{
     padding: 10px;
     background: #f8f8f8;
     border-bottom: 1px solid #000;
 }
-
 #hotkeys .row .title,  #settings .row .title{
     font-family: Arial;
     text-transform: uppercase;
     font-weight: 600;
     font-size: 13px;
 }
-
 #hotkeys .row .key, #settings .row .key {
     float: right;
     margin-right: 6px;
@@ -462,7 +455,6 @@ function setGUIStyle() {
     font-weight: 700;
     cursor: pointer;
 }
-
 #inputs {
     display: none;
     width: 400px;
@@ -472,41 +464,34 @@ function setGUIStyle() {
     top: 50%;
     transform: translate(-50%, -50%);
 }
-
 .input-hidden {
     color: transparent !important;
 }
-
 .input-hidden::selection {
     background: #777 !important;
     color: transparent !important;
 }
-
 .inputs-tab {
     cursor: pointer;
     background: #fff;
     padding: 6px 10px;
     border-radius: 4px 4px 0px 0px;
 }
-
 .inputs-tab.active {
     background: #fff;
 }
-
 .inputs-tab-bar {
     color: #000;
     font-size: 14px;
     font-family: Arial;
     height: 22px;
 }
-
 .inputs-menu-container {
     width: 100%;
     height: 478px;
     background: rgba(51, 51, 51, 0.5);
     border-radius: 0px 0px 4px 4px;
 }
-
 .inputs-menu {
     width: 100%;
     position: absolute;
@@ -514,11 +499,9 @@ function setGUIStyle() {
     display: none;
     color: #000;
 }
-
 .inputs-menu.active {
     display: block;
 }
-
 .inputs-tab.close {
     float: right;
     margin-right: 5px;
