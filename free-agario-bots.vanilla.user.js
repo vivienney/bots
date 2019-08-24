@@ -117,7 +117,7 @@ window.setUpOptions = () => {
     }
 }
 
-window.SERVER_HOST = 'wss://localhost:8083' // Hostname/IP of the server where the bots are running [Default = localhost (your own pc)]
+window.SERVER_HOST = 'ws://localhost:8083' // Hostname/IP of the server where the bots are running [Default = localhost (your own pc)]
 
 window.ZOOM_SPEED = 0.85 // Numerical value that indicates the speed of the mouse wheel when zooming, value must be between 0.01-0.99 [Default = 0.85]
 
