@@ -385,7 +385,7 @@ function setGUI() {
             <a href="https://discord.gg/SDMNEcJ" target="_blank">Free Agar.io Bots</a>
         </h2>
         <h5 id="botsAuthor">
-            Developed by <a href="https://www.youtube.com/channel/UCZo9WmnFPWw38q65Llu5Lug" target="_blank">Nel</a>
+            Developed by <a href="https://twitter.com/unelocked" target="_blank">Nel</a>
         </h5>
         <span id="statusText">Status: <b id="userStatus">Disconnected</b></span>
         <br>
