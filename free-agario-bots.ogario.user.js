@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Free Agar.io Bots (OGARio Version)
-// @version      1.0.8
+// @version      1.0.9
 // @description  Free open source agar.io bots with OGARio
 // @author       Nel & szymy (OGARio deobfuscated by ReF)
 // @grant        GM_xmlhttpRequest
@@ -10,7 +10,7 @@
 // @connect      cdn.ogario.ovh
 // ==/UserScript==
 
-const CLIENT_VERSION = '1.0.8'
+const CLIENT_VERSION = '1.0.9'
 
 if(location.host === 'agar.io' && location.pathname === '/'){
     location.href = `https://agar.io/ogario${location.hash}`
