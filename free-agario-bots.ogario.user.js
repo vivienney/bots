@@ -6,6 +6,7 @@
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // @match        *://agar.io/*
+// @connect      raw.githubusercontent.com
 // @connect      cdn.ogario.ovh
 // ==/UserScript==
 
